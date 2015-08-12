@@ -3,7 +3,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from quickstart.serializers import UserSerializer, GroupSerializer
 
-from rest_framework.authtoken.models import Token
+
 
 # Create your views here.
 
@@ -22,9 +22,3 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-
-
-def home(request):
-
-    token = Token.objects.get_or_create(user=request.user) # Authorization: Token 4070bfa4f47854f3fe7f466a7a01743f105726be
-    return HttpResponse(token[0].key)
