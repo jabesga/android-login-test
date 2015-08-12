@@ -10,24 +10,40 @@ class ApiTestCase(TestCase):
     
     def setUp(self):
         global token
+        global c
         
         u, c = User.objects.get_or_create(username='user1', email='user@test.com')
         u.set_password('password')
         u.save()
         token, created = Token.objects.get_or_create(user=u)
         
+        c = APIClient()
+         
+    def test_register_view(self):
+        
+        # Register an user
+        payload = {'username':'newuser', 'email':'newuser@test.com', 'password':'pass'}
+        response = c.post('/api/v1/register/', data=payload)
+        self.assertTrue(response.content == '{"result": "registered"}')
+        
+        # Register it again
+        
+        response = c.post('/api/v1/register/', data=payload)
+        self.assertTrue(response.content == '{"result": "already"}')
+        
         
     def test_access_view(self):
-        c = APIClient()
+        
+        # Can not access
+        response = c.get('/api/v1/access/')
+        self.assertTrue(response.content == '{"detail":"Authentication credentials were not provided."}')
+        
+        # Can access
         c.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         response = c.get('/api/v1/access/')
-        self.assertTrue(response.content == 'Access granted')
-    
-    
+        self.assertTrue(response.content == '{"result": "granted"}')
+        
     def test_login_url(self):
-        
-        c = APIClient()
-        
         # False credentials
         response = c.post('/api/v1/login/', data={'username':'1234', 'password':'1234'})
         self.assertTrue(response.content == '{"non_field_errors":["Unable to log in with provided credentials."]}')
