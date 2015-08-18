@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
+from api.models import Quest
+from api.serializers import QuestSerializers
+from rest_framework.renderers import JSONRenderer
 
 @csrf_exempt
 def register(request):
@@ -26,3 +29,22 @@ def register(request):
 @permission_classes((IsAuthenticated,))
 def access(request):
     return JsonResponse({'result': 'granted'})
+ 
+ 
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication,))
+@permission_classes((IsAuthenticated,))
+def check_quest(request):
+    q = Quest.objects.all()
+    serializer = QuestSerializers(q, many=True)
+    json = JSONRenderer().render(serializer.data)
+    return HttpResponse(json)
+
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication,))
+@permission_classes((IsAuthenticated,))
+def create_quest(request):
+    if request.method == 'POST':
+        q = Quest(name=request.POST['quest_name'], description=request.POST['quest_name'], master=request.user)
+        q.save()
+        return JsonResponse({'result': 'success'})    
