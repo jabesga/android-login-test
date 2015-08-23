@@ -37,6 +37,7 @@ class ApiTestCase(TestCase):
          
     def test_create_quest(self):
         
+        
         # GET method
         response = c.get('/api/v1/quest/create/')
         self.assertTrue(response.content == '{"detail":"Authentication credentials were not provided."}')
