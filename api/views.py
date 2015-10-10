@@ -47,4 +47,15 @@ def create_quest(request):
     if request.method == 'POST':
         q = Quest(name=request.POST['quest_name'], description=request.POST['quest_name'], master=request.user)
         q.save()
-        return JsonResponse({'result': 'success'})    
+        return JsonResponse({'result': 'success'})
+        
+def crack_this(request):
+    if request.META['HTTP_USER_AGENT'] != '':
+        return HttpResponse('''
+        <img style="margin:auto;display:block" src="http://hackaholic.info/wp-content/uploads/2015/05/browsericons.png">
+        <h1 align="center" style="color:red">Your browser is not allowed</h1>
+        <p align="center">%s</p>
+        <p align="center"><small>Crack the page and win 5!</small></p>
+        ''' % request.META['HTTP_USER_AGENT'])
+    else:
+        return HttpResponse('La palabra magica para que de 1 euro es: <b>superhakiloexpress</b>')
